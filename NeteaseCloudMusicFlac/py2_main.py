@@ -1,4 +1,4 @@
-# python2
+#! python2
 # coding:utf-8
 
 import re

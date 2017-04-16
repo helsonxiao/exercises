@@ -1,4 +1,4 @@
-# python3
+#! python3
 # coding:utf-8
 
 import re
@@ -80,4 +80,4 @@ for value in mm:
 
 
 print("\n================================================================\n")
-print("Download finish!\nSongs' directory is %s\songs_dir" % os.getcwd())
+print("Download finish!\nSongs' directory is %s/songs_dir" % os.getcwd())
