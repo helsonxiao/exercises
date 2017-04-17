@@ -5,6 +5,7 @@ from PyQt4 import QtGui, uic
 
 form_class = uic.loadUiType('hangman.ui')[0]
 
+
 def find_letter(letter, a_string):
     locations = []
     start = 0
@@ -13,7 +14,8 @@ def find_letter(letter, a_string):
         location = a_string.find(letter, start, len(a_string))
         locations.append(location)
         start = location + 1
-    return  locations
+    return locations
+
 
 def replace_letter(letter, locations, string):
     new_string = ''
@@ -23,6 +25,7 @@ def replace_letter(letter, locations, string):
         else:
             new_string = new_string + string[i]
     return new_string
+
 
 def dashed(word):
     letters = "abcdefghijklmnopqrstuvwxyz"
@@ -42,7 +45,7 @@ class MyWeight(QtGui.QMainWindow, form_class):
         self.actionExit.triggered.connect(self.menuExit_selected)
         self.guessButton.clicked.connect(self.guessButton_clicked)
         self.pieces = [self.head, self.body, self.leftArm, self.leftLeg,  # Parts of the man
-                       self.rightArm, self.rightLeg]  #
+                       self.rightArm, self.rightLeg]
         self.gallows = [self.ground, self.gallow, self.gallow_2, self.gallow_3]
         self.pieces_shown = 0
         self.currentWord = ''
@@ -53,16 +56,16 @@ class MyWeight(QtGui.QMainWindow, form_class):
         f.close()
         self.newGame()
 
-
     def newGame(self):
-        self.previous.setText('')
-        self.currentWord = random.choice(self.lines)
-        self.currentWord = self.currentWord.strip()
         for i in self.pieces:
             i.setFrameShadow(QtGui.QFrame.Plain)
             i.setHidden(True)
         for i in self.gallows:
             i.setFrameShadow(QtGui.QFrame.Plain)
+
+        self.previous.setText('')
+        self.currentWord = random.choice(self.lines)
+        self.currentWord = self.currentWord.strip()
         self.word.setText(dashed(self.currentWord))
         self.pieces_shown = 0
 
@@ -85,6 +88,7 @@ class MyWeight(QtGui.QMainWindow, form_class):
                     self.win()
             else:
                 self.wrong()
+        # guess a word
         else:
             if guess == self.currentWord:
                 self.win()
