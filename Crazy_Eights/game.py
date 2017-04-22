@@ -48,7 +48,6 @@ def new_suit_id():
         print('InputError!')
         new_suit_id()
 
-
 cards = []
 for suit_id in range(1,5):
     for rank_id in range(1, 14):
@@ -84,20 +83,9 @@ while not done:
     for card in hand:
         if card.suit == display.suit or \
                         card.rank == display.rank or card.rank == 8:
-            # print('You have ' + card.short_name)
             weapons.append(card)
-            # decision = raw_input('Play or not? Please enter Y/N: ')
-            # judge(decision)
-        # 这里存在一个逻辑性的 BUG
-        # elif card.rank == 8:
-        #     show_card(hand)
-        #     print('You have magic 8!')
-        #     decision = raw_input('Play or not? Please enter Y/N: ')
-        #     judge(decision)
-        #     suit_id = new_suit_id()
     if not weapons:
-        print('Bad luck, no match was found.'
-              'Append a card to you.')
+        print('Bad luck, no match was found.\nAppend a card to you.')
         append_card(hand)
     elif weapons:   # 出招吧！ todo
         pass        # 玩家若出8，可以指定新的花色。若出对应牌则重新抽取展示牌。
@@ -111,8 +99,7 @@ while not done:
                         card.rank == display.rank or card.rank == 8:
             c_weapons.append(card)
     if not c_weapons:
-        print("Good luck! Computer also doesn't have match card."
-              "Append a card to computer")
+        print("Good luck! Computer also doesn't have match card.\nAppend a card to computer.")
         append_card(hand)
     elif c_weapons: # 电脑随机出牌
         c_choice = random.choice(c_weapons)
@@ -131,3 +118,14 @@ while not done:
 
     if score >= 200 or c_score >= 200: # 率先达到200分的人取得胜利 todo
         done = True
+
+        # decision = raw_input('Play or not? Please enter Y/N: ')
+        # judge(decision)
+
+        # 这里存在一个逻辑性的 BUG
+        # elif card.rank == 8:
+        #     show_card(hand)
+        #     print('You have magic 8!')
+        #     decision = raw_input('Play or not? Please enter Y/N: ')
+        #     judge(decision)
+        #     suit_id = new_suit_id()
