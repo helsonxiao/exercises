@@ -25,21 +25,21 @@ def append_card(obj):
     obj.append(card)
     cards.remove(card)
 
-def judge(deci):
-    if deci == 'Y' or deci == 'y':
-        print("Brilliant! Let's move on.")
-        print('...')
-        hand.remove(card)
-        show_card(hand)
-    elif deci == 'N' or deci == 'n':
-        print("You're a nice person. Good luck!")
-        print('...')
-        append_card(hand)
-        print('Card appended.')
-        show_card(hand)
-    else:
-        deci = raw_input("Error! Please enter Y/N:")
-        judge(deci)
+# def judge(deci):
+#     if deci == 'Y' or deci == 'y':
+#         print("Brilliant! Let's move on.")
+#         print('...')
+#         hand.remove(card)
+#         show_card(hand)
+#     elif deci == 'N' or deci == 'n':
+#         print("You're a nice person. Good luck!")
+#         print('...')
+#         append_card(hand)
+#         print('Card appended.')
+#         show_card(hand)
+#     else:
+#         deci = raw_input("Error! Please enter Y/N:")
+#         judge(deci)
 
 def new_suit_id():
     print('Please choose a new suit:')
@@ -108,6 +108,7 @@ while not done:
             display.rank = None
             print('Now, computer should show card matching suit - %s' % display.suit)
         elif weapon.suit == display.suit or weapon.rank == display.rank: # 若出对应牌，重新抽取展示牌。
+            hand.remove(weapon)
             display = random.choice(cards)
             cards.remove(display)   # 抽出展示牌后，牌堆列表发生变化
 
@@ -129,9 +130,10 @@ while not done:
         if c_choice.value == 8: # 若电脑出8，随机改变花色。若出对应牌则重新选取展示牌。
             c_suit = random.choice(suits)
             print('Computer chose a new suit - %s' % c_suit)
-            display.suit = suits[new_suit_id]
+            display.suit = c_suit
             display.rank = None
-        elif c_weapons.suit == display.suit or c_weapons.rank == display.rank: # 若出对应牌，重新抽取展示牌。
+        elif c_choice.suit == display.suit or c_choice.rank == display.rank: # 若出对应牌，重新抽取展示牌。
+            computer.remove(c_choice)
             display = random.choice(cards)
             cards.remove(display)   # 抽出展示牌后，牌堆列表发生变化
 
