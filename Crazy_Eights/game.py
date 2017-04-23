@@ -7,7 +7,7 @@ def show_card(obj):
     print('Now you have these cards:')
     i = 0
     for card in obj:
-        print(i + ' - ' + card.long_name)
+        print(str(i) + ' - ' + card.long_name)
         i += 1
     print('...')
 
@@ -15,7 +15,7 @@ def show_weapon(obj):
     print('Weapon List:')
     i = 0
     for card in obj:
-        print(i + ' - ' + card.long_name)
+        print(str(i) + ' - ' + card.long_name)
         i += 1
     print('...')
 
@@ -38,7 +38,7 @@ def append_card(obj):
 #         print('Card appended.')
 #         show_card(hand)
 #     else:
-#         deci = raw_input("Error! Please enter Y/N:")
+#         deci = input("Error! Please enter Y/N:")
 #         judge(deci)
 
 def new_suit_id():
@@ -47,7 +47,7 @@ def new_suit_id():
     print('1 - Hearts')
     print('2 - Spades')
     print('3 - Clubs')
-    new_one = raw_input('Enter your number: ')
+    new_one = input('Enter your number: ')
     if new_one in range(0,4):
         return new_one
     else:
@@ -58,7 +58,7 @@ def new_suit_id():
 
 suits =['Diamonds', 'Hearts', 'Spades', 'Clubs']    # 生成花色列表
 cards = []  # 生成牌堆，52张牌
-for suit_id in range(1,5):
+for suit_id in range(1, 5):
     for rank_id in range(1, 14):
         new_card = Card(suit_id, rank_id)
         if rank_id == 8:
@@ -92,27 +92,30 @@ while not done:
 
     if not weapons: # 没有对应武器，增加手牌
         print('Bad luck, no match was found.\nAppend a card to you.')
+        print('...')
         append_card(hand)
 
-    elif weapons:   # 出招
+    elif weapons:   # 拥有武器，选择出牌或者不出牌 todo
         show_weapon(weapons)
-        weapon_index = raw_input('Which one do you want to use? ')
-        while not isinstance(weapon_index, int):
+        weapon_index = input('Which one do you want to use? ')
+        while not isinstance(weapon_index, int) or (weapon_index not in range(0, len(weapons))):
             print('InputError!')
-            weapon_index = raw_input('Please choose one:')
+            weapon_index = input('Please choose one:')
         weapon = weapons[weapon_index]
         hand.remove(weapon) # 出牌后，手牌列表发生变化
-        if weapon.value == 8:   # 若出8，可改变展示牌花色。同时抹去rank属性。
-            new_suit_id = new_suit_id()
-            display.suit = suits[new_suit_id]
-            display.rank = None
+        if weapon.rank == '8':   # 若出8，可改变展示牌花色。同时抹去rank属性。
+            suit_id = new_suit_id()
+            display.suit = suits[suit_id]
+            display.rank = '0'
             print('Now, computer should show card matching suit - %s' % display.suit)
         elif weapon.suit == display.suit or weapon.rank == display.rank: # 若出对应牌，重新抽取展示牌。
-            hand.remove(weapon)
             display = random.choice(cards)
+            print('New display card is %s' % display.long_name)
+            print('...')
             cards.remove(display)   # 抽出展示牌后，牌堆列表发生变化
 
     if not hand:    # 玩家手牌消耗完毕，根据电脑手牌记分，然后重新发牌 todo
+        done = True
         pass
 
     c_weapons = []  # 电脑的武器
@@ -126,21 +129,25 @@ while not done:
     elif c_weapons: # 电脑随机出牌, 2种情况
         c_choice = random.choice(c_weapons)
         print('Computer shows its %s' % c_choice.short_name)
+        print('...')
         computer.remove(c_choice)
-        if c_choice.value == 8: # 若电脑出8，随机改变花色。若出对应牌则重新选取展示牌。
+        if c_choice.rank == '8': # 若电脑出8，随机改变花色。若出对应牌则重新选取展示牌。
             c_suit = random.choice(suits)
             print('Computer chose a new suit - %s' % c_suit)
             display.suit = c_suit
-            display.rank = None
+            display.rank = '0'
         elif c_choice.suit == display.suit or c_choice.rank == display.rank: # 若出对应牌，重新抽取展示牌。
-            computer.remove(c_choice)
             display = random.choice(cards)
+            print('New display card is %s' % display.long_name)
+            print('...')
             cards.remove(display)   # 抽出展示牌后，牌堆列表发生变化
 
     if not computer:    # 电脑手牌消耗完毕，根据玩家手牌记分，然后重新发牌 todo
+        done = True
         pass
 
     if not cards:   # 卡牌消耗完毕，根绝双方的手牌分别记分，重新发牌 todo
+        done = True
         pass
 
     if score >= 200 or c_score >= 200: # 率先达到200分的人取得胜利 todo
