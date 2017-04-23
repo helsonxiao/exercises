@@ -1,16 +1,23 @@
 #! python2
 # coding:utf-8
-
 from cards import Card
 import random
 
-
 def show_card(obj):
     print('Now you have these cards:')
+    i = 0
     for card in obj:
-        print(card.long_name)
+        print(i + ' - ' + card.long_name)
+        i += 1
     print('...')
 
+def show_weapon(obj):
+    print('Weapon List:')
+    i = 0
+    for card in obj:
+        print(i + ' - ' + card.long_name)
+        i += 1
+    print('...')
 
 def append_card(obj):
     global cards
@@ -34,21 +41,23 @@ def judge(deci):
         deci = raw_input("Error! Please enter Y/N:")
         judge(deci)
 
-
 def new_suit_id():
     print('Please choose a new suit:')
-    print('1 - Diamonds')
-    print('2 - Hearts')
-    print('3 - Spades')
-    print('4 - Clubs')
+    print('0 - Diamonds')
+    print('1 - Hearts')
+    print('2 - Spades')
+    print('3 - Clubs')
     new_one = raw_input('Enter your number: ')
-    if new_one in range(1,5):
+    if new_one in range(0,4):
         return new_one
     else:
         print('InputError!')
         new_suit_id()
 
-cards = []
+# Go!
+
+suits =['Diamonds', 'Hearts', 'Spades', 'Clubs']    # 生成花色列表
+cards = []  # 生成牌堆，52张牌
 for suit_id in range(1,5):
     for rank_id in range(1, 14):
         new_card = Card(suit_id, rank_id)
@@ -56,20 +65,16 @@ for suit_id in range(1,5):
             new_card.value = 50
         cards.append(new_card)
 
-hand = []
+hand = []   # 发放玩家的初始手牌
 for i in range(5):
-    card = random.choice(cards)
-    hand.append(card)
-    cards.remove(card)
-show_card(hand)
+    append_card(hand)
+show_card(hand) # 展示玩家手牌
 
-computer = []
+computer = []   # 发放电脑的初始手牌
 for i in range(5):
-    card = random.choice(cards)
-    computer.append(card)
-    cards.remove(card)
+    append_card(computer)
 
-display = random.choice(cards)
+display = random.choice(cards)  #　抽取首张展示牌
 cards.remove(display)
 print('The display card is ' + display.long_name)
 print('...')
@@ -79,16 +84,32 @@ c_score = 0 # 电脑积分
 
 done = False
 while not done:
-    weapons = []    # 玩家的武器
+    weapons = []    # 生成玩家的武器列表
     for card in hand:
         if card.suit == display.suit or \
                         card.rank == display.rank or card.rank == 8:
             weapons.append(card)
-    if not weapons:
+
+    if not weapons: # 没有对应武器，增加手牌
         print('Bad luck, no match was found.\nAppend a card to you.')
         append_card(hand)
-    elif weapons:   # 出招吧！ todo
-        pass        # 玩家若出8，可以指定新的花色。若出对应牌则重新抽取展示牌。
+
+    elif weapons:   # 出招
+        show_weapon(weapons)
+        weapon_index = raw_input('Which one do you want to use? ')
+        while not isinstance(weapon_index, int):
+            print('InputError!')
+            weapon_index = raw_input('Please choose one:')
+        weapon = weapons[weapon_index]
+        hand.remove(weapon) # 出牌后，手牌列表发生变化
+        if weapon.value == 8:   # 若出8，可改变展示牌花色。同时抹去rank属性。
+            new_suit_id = new_suit_id()
+            display.suit = suits[new_suit_id]
+            display.rank = None
+            print('Now, computer should show card matching suit - %s' % display.suit)
+        elif weapon.suit == display.suit or weapon.rank == display.rank: # 若出对应牌，重新抽取展示牌。
+            display = random.choice(cards)
+            cards.remove(display)   # 抽出展示牌后，牌堆列表发生变化
 
     if not hand:    # 玩家手牌消耗完毕，根据电脑手牌记分，然后重新发牌 todo
         pass
@@ -99,16 +120,20 @@ while not done:
                         card.rank == display.rank or card.rank == 8:
             c_weapons.append(card)
     if not c_weapons:
-        print("Good luck! Computer also doesn't have match card.\nAppend a card to computer.")
-        append_card(hand)
-    elif c_weapons: # 电脑随机出牌
+        print("Good luck! Computer doesn't have match card.\nAppend a card to computer.")
+        append_card(computer)
+    elif c_weapons: # 电脑随机出牌, 2种情况
         c_choice = random.choice(c_weapons)
         print('Computer shows its %s' % c_choice.short_name)
-        c_weapons.remove(c_choice)
+        computer.remove(c_choice)
         if c_choice.value == 8: # 若电脑出8，随机改变花色。若出对应牌则重新选取展示牌。
-            c_suit = random.choice(['Diamonds', 'Hearts', 'Spades', 'Clubs'])
+            c_suit = random.choice(suits)
             print('Computer chose a new suit - %s' % c_suit)
-            # todo
+            display.suit = suits[new_suit_id]
+            display.rank = None
+        elif c_weapons.suit == display.suit or c_weapons.rank == display.rank: # 若出对应牌，重新抽取展示牌。
+            display = random.choice(cards)
+            cards.remove(display)   # 抽出展示牌后，牌堆列表发生变化
 
     if not computer:    # 电脑手牌消耗完毕，根据玩家手牌记分，然后重新发牌 todo
         pass
@@ -118,14 +143,3 @@ while not done:
 
     if score >= 200 or c_score >= 200: # 率先达到200分的人取得胜利 todo
         done = True
-
-        # decision = raw_input('Play or not? Please enter Y/N: ')
-        # judge(decision)
-
-        # 这里存在一个逻辑性的 BUG
-        # elif card.rank == 8:
-        #     show_card(hand)
-        #     print('You have magic 8!')
-        #     decision = raw_input('Play or not? Please enter Y/N: ')
-        #     judge(decision)
-        #     suit_id = new_suit_id()
