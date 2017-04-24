@@ -21,6 +21,7 @@ def show_weapon(card_list):
 
 
 def append_card(card_list):
+    global a_card
     a_card = random.choice(cards)
     card_list.append(a_card)
     cards.remove(a_card)
@@ -64,7 +65,7 @@ def cards_test():
         score += calculate_score(computer)
         c_score += calculate_score(hand)
         print('No more card. Shuffling.')
-        print('...')
+        print('========================')
         GAME_START()
 
 
@@ -112,21 +113,18 @@ while not done:
     show_card(hand)
     weapons = []    # 生成玩家的武器列表
     for card in hand:
-        if card.suit == display.suit or \
-                        card.rank == display.rank or card.rank == 8:
+        if card.suit == display.suit or card.rank == display.rank or card.rank == '8':
             weapons.append(card)
 
     if not weapons:  # 没有对应武器，增加手牌
         print('Bad luck, no match was found.')
-        print('Append a card to you.')
-        print('...')
         append_card(hand)
-        show_card(hand)
-
+        print('Appended {:s} to you.').format(a_card.long_name)
+        print('...')
     elif weapons:   # 拥有武器，选择出牌或者不出牌 todo
         show_weapon(weapons)
-        while True: # 输入是非数字时会出错 todo
-            weapon_index = int(raw_input('Which one do you want to use:'))  # py2 中的input只能输入数字，需要转换
+        while True: # 当输入为非数字时会出错 todo
+            weapon_index = int(raw_input('Which one do you want to use:'))  # py2 中的input只能输入数字
             if weapon_index in range(0, len(weapons)):
                 break
             else:
@@ -137,8 +135,9 @@ while not done:
         if not hand:    # 玩家手牌消耗完毕，根据电脑手牌记分，然后重新开始
             score += calculate_score(computer)
             GAME_START()
-            print('You get one.')
+            print('You got one.')
             print("Your score is {0:d}, computer's score is {1:d}.").format(score, c_score)
+            print('=====================================')
         if weapon.rank == '8':   # 若出8，玩家可以指定花色让电脑出牌。抹去rank属性。
             suit_id = new_suit_id()
             display.suit = suits[suit_id]
@@ -154,42 +153,42 @@ while not done:
 
     c_weapons = []  # 电脑的武器
     for card in computer:
-        if card.suit == display.suit or \
-                        card.rank == display.rank or card.rank == 8:
+        if card.suit == display.suit or card.rank == display.rank or card.rank == '8':
             c_weapons.append(card)
     if not c_weapons:
-        print("Good luck! Computer doesn't have match card.")
-        print('Append a card to computer.')
-        print('...')
+        print("Good luck! Computer failed to match card.")
         append_card(computer)
-    elif c_weapons: # 电脑随机出牌, 2种情况
+        print('Appended a card to computer.')
+        print('...')
+    elif c_weapons:  # 电脑随机出牌
         c_choice = random.choice(c_weapons)
         print('Computer shows its %s' % c_choice.short_name)
         print('...')
         computer.remove(c_choice)
-        if not computer:    # 电脑手牌消耗完毕，根据玩家手牌记分，然后重新发牌 todo
+        if not computer:    # 电脑手牌消耗完毕，根据玩家手牌记分，然后重新发牌
             c_score += calculate_score(hand)
             GAME_START()
-            print('Computer gets one.')
+            print('Computer got one.')
             print("Your score is {0:d}, computer's score is {1:d}.").format(score, c_score)
-        if c_choice.rank == '8': # 若电脑出8，随机改变花色。若出对应牌则重新选取展示牌。
+            print('=====================================')
+        if c_choice.rank == '8':  # 若电脑出8，随机改变花色。若出对应牌则重新选取展示牌。
             c_suit = random.choice(suits)
             print('Computer chose a new suit - %s' % c_suit)
             print('...')
             display.suit = c_suit
             display.rank = 0
-        elif c_choice.suit == display.suit or c_choice.rank == display.rank: # 若出对应牌，重新抽取展示牌。
+        elif c_choice.suit == display.suit or c_choice.rank == display.rank:  # 若电脑出对应牌，重新抽取展示牌。
             display = random.choice(cards)
             print('New display card is %s' % display.long_name)
             print('...')
             cards.remove(display)   # 抽出展示牌后，牌堆列表发生变化
             cards_test()
 
-    if score >= 20:  # 率先达到20分的人取得胜利 todo
+    if score >= 60:  # 率先达到60分的人取得胜利，保存分数至文档 todo
         print('Congratulations! You are the winner!')
         print("Your score is {0:d}, computer's score is {1:d}.").format(score, c_score)
         done = True
-    elif c_score >= 20:
+    elif c_score >= 60:
         print('Sorry, you lose.')
         print("Your score is {0:d}, computer's score is {1:d}.").format(score, c_score)
         done = True

@@ -38,6 +38,6 @@ class Card():
             self.suit = 'SuitError'
 
         self.short_name = self.rank[0] + self.suit[0]
-        if self.rank == 10:
+        if self.rank == '10':
             self.short_name = self.rank + self.suit[0]
         self.long_name = self.rank + ' of ' + self.suit
