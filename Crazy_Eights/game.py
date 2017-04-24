@@ -3,6 +3,7 @@
 from cards import Card
 import random
 
+
 def show_card(card_list):
     print('Your cards:')
     for card in card_list:
@@ -20,7 +21,6 @@ def show_weapon(card_list):
 
 
 def append_card(card_list):
-    global cards
     a_card = random.choice(cards)
     card_list.append(a_card)
     cards.remove(a_card)
@@ -39,7 +39,7 @@ def append_card(card_list):
 #         print('Card appended.')
 #         show_card(hand)
 #     else:
-#         deci = input("Error! Please enter Y/N:")
+#         deci = raw_input("Error! Please enter Y/N:")
 #         judge(deci)
 
 
@@ -50,16 +50,16 @@ def new_suit_id():
         print('1 - Hearts')
         print('2 - Spades')
         print('3 - Clubs')
-        new_one = input('Enter your number: ')
-        if new_one not in range(0,4):
-            print('InputError!')
-        elif new_one in range(0, 4):
+        new_one = int(raw_input('Enter your number:'))
+        if new_one in range(0,4):
             break
+        elif new_one not in range(0, 4):
+            print('Out of range!')
     return new_one
 
 
 def cards_test():
-    global score, computer, c_score, hand
+    global score, c_score
     if not cards:   # 卡牌消耗完毕，根绝双方的手牌分别记分，重新发牌
         score += calculate_score(computer)
         c_score += calculate_score(hand)
@@ -69,10 +69,10 @@ def cards_test():
 
 
 def calculate_score(card_list):
-    sum = 0
+    s = 0
     for card in card_list:
-        sum += card.value
-    return sum
+        s += card.value
+    return s
 
 
 def GAME_START():
@@ -85,16 +85,15 @@ def GAME_START():
                 new_card.value = 50
             cards.append(new_card)
 
-    hand = []   # 发放玩家的初始手牌
+    hand = []   # 清空玩家的初始手牌
     for i in range(5):
         append_card(hand)
-    show_card(hand) # 展示玩家手牌
 
-    computer = []   # 发放电脑的初始手牌
+    computer = []   # 清空电脑的初始手牌
     for i in range(5):
         append_card(computer)
 
-    display = random.choice(cards)  #　抽取展示牌
+    display = random.choice(cards)  # 抽取展示牌
     cards.remove(display)
     cards_test()
     print('The display card is ' + display.long_name)
@@ -103,41 +102,44 @@ def GAME_START():
 
 # Let's Go!
 suits =['Diamonds', 'Hearts', 'Spades', 'Clubs']    # 生成花色列表
-score = 0 # 玩家积分
-c_score = 0 # 电脑积分
+score = 0  # 玩家积分
+c_score = 0  # 电脑积分
 print("Let's go!")
 print('...')
 GAME_START()
 done = False
 while not done:
-    if score >= 100 or c_score >= 100: # 率先达到100分的人取得胜利 todo
-        done = True
-
+    show_card(hand)
     weapons = []    # 生成玩家的武器列表
     for card in hand:
         if card.suit == display.suit or \
                         card.rank == display.rank or card.rank == 8:
             weapons.append(card)
 
-    if not weapons: # 没有对应武器，增加手牌
+    if not weapons:  # 没有对应武器，增加手牌
         print('Bad luck, no match was found.')
         print('Append a card to you.')
         print('...')
         append_card(hand)
+        show_card(hand)
 
     elif weapons:   # 拥有武器，选择出牌或者不出牌 todo
         show_weapon(weapons)
-        weapon_index = input('Which one do you want to use? ')
-        while not isinstance(weapon_index, int) or (weapon_index not in range(0, len(weapons))):
-            print('InputError!')
-            weapon_index = input('Please choose a right one:')
+        while True: # 输入是非数字时会出错 todo
+            weapon_index = int(raw_input('Which one do you want to use:'))  # py2 中的input只能输入数字，需要转换
+            if weapon_index in range(0, len(weapons)):
+                break
+            else:
+                print('InputError!')
         print('...')
         weapon = weapons[weapon_index]
         hand.remove(weapon) # 出牌后，手牌列表发生变化
         if not hand:    # 玩家手牌消耗完毕，根据电脑手牌记分，然后重新开始
             score += calculate_score(computer)
             GAME_START()
-        if weapon.rank == '8':   # 若出8，可改变展示牌花色。同时抹去rank属性。
+            print('You get one.')
+            print("Your score is {0:d}, computer's score is {1:d}.").format(score, c_score)
+        if weapon.rank == '8':   # 若出8，玩家可以指定花色让电脑出牌。抹去rank属性。
             suit_id = new_suit_id()
             display.suit = suits[suit_id]
             display.rank = 0
@@ -168,6 +170,8 @@ while not done:
         if not computer:    # 电脑手牌消耗完毕，根据玩家手牌记分，然后重新发牌 todo
             c_score += calculate_score(hand)
             GAME_START()
+            print('Computer gets one.')
+            print("Your score is {0:d}, computer's score is {1:d}.").format(score, c_score)
         if c_choice.rank == '8': # 若电脑出8，随机改变花色。若出对应牌则重新选取展示牌。
             c_suit = random.choice(suits)
             print('Computer chose a new suit - %s' % c_suit)
@@ -180,3 +184,12 @@ while not done:
             print('...')
             cards.remove(display)   # 抽出展示牌后，牌堆列表发生变化
             cards_test()
+
+    if score >= 20:  # 率先达到20分的人取得胜利 todo
+        print('Congratulations! You are the winner!')
+        print("Your score is {0:d}, computer's score is {1:d}.").format(score, c_score)
+        done = True
+    elif c_score >= 20:
+        print('Sorry, you lose.')
+        print("Your score is {0:d}, computer's score is {1:d}.").format(score, c_score)
+        done = True
