@@ -13,11 +13,9 @@ def show_card(card_list):
 
 def show_weapon(card_list):
     print('Weapon List:')
-    i = 0
     for card in card_list:
-        print(str(i) + ' - ' + card.long_name)
-        i += 1
-    print('...')
+        print card.short_name,
+    print
 
 
 def append_card(card_list):
@@ -123,12 +121,18 @@ while not done:
         print('...')
     elif weapons:   # 拥有武器，选择出牌或者不出牌 todo
         show_weapon(weapons)
-        while True: # 当输入为非数字时会出错 todo
-            weapon_index = int(raw_input('Which one do you want to use:'))  # py2 中的input只能输入数字
-            if weapon_index in range(0, len(weapons)):
-                break
-            else:
-                print('InputError!')
+        valid_input = False
+        weapon_index = 0    # 根据答案粗糙地修改了下获取输入的方法，不然要大改，太麻烦了。
+        while not valid_input:
+            input_name = raw_input("Which one do you want to use? Enter card's short name: ")
+            # py2 中的input只能输入数字
+            for card in weapons:
+                if input_name == card.short_name:
+                    valid_input = True
+                    break
+                weapon_index += 1
+            if not valid_input:
+                print('Input is invalid!')
         print('...')
         weapon = weapons[weapon_index]
         hand.remove(weapon) # 出牌后，手牌列表发生变化
