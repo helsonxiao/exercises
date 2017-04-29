@@ -101,6 +101,7 @@ blockquote::before, blockquote::after, q::before, q::after {
 h1, h2, h3, h4, h5, h6 {
   margin: 20px 0 10px;
   padding: 0;
+  font-weight: bold;
   font-style: bold !important;
   margin: 1.5em 5px !important;
 }
@@ -129,6 +130,7 @@ h5 {
 
 h6 {
   font-size: 13px;
+  color: #777;
 }
 
 table {
@@ -160,7 +162,7 @@ table tr:nth-child(2n) {
 }
 
 table tr th, table tr td {
-  font-size: 16px;
+  font-size: 15px;
   border: 1px solid #CCC;
   margin: 0;
   padding: 5px 10px;
