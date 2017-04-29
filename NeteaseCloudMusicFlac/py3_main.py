@@ -9,53 +9,60 @@ import urllib.error
 import os
 import sys
 
-minimumsize = 10    # 文件的最小尺寸
-print("fetching msg from %s \n" % sys.argv[1])  # 解释操作，输出你的待爬取地址
-url = re.sub("#/", "", sys.argv[1]) # substitute, 消除"#/"得到新的url
-r = requests.get(url)   # python开始读取url，内容全部放入r
+minimumsize = 10  # 文件的最小尺寸
+print("fetching msg from %s \n" % sys.argv[1])  # 获取命令行输入的第1项，第0项是py文件名
+url = re.sub("#/", "", sys.argv[1])  # substitute, 消除"#/"
+r = requests.get(url)  # python开始读取url，内容全部放入r
 contents = r.text   # 以 r 中的 text 内容赋予 contents
-res = r'<ul class="f-hide">(.*?)</ul>'  # todo
-mm = re.findall(res, contents, re.S | re.M) # todo
-CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))  # todo
+res = r'<ul class="f-hide">(.*?)</ul>'  # 贪婪匹配
+mm = re.findall(res, contents, re.S | re.M)  # 在 contents 中抓取满足 res 模式的内容
+                                             # re.MULTILINE | re.DOTALL
+CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))  # 应该尝试下 os.path.dirname(__file__) todo
+# print(__file__)   F:/exercises/NeteaseCloudMusicFlac/py3_main.py
+# print(os.path.realpath(__file__)) F:\exercises\NeteaseCloudMusicFlac\py3_main.py
+# print(CURRENT_PATH)   F:\exercises\NeteaseCloudMusicFlac
 
 if(mm):
-    contents = mm[0]
+    contents = mm[0]  # 第1项是换行符，抛弃
 else:
     print('Can not fetch information form URL. Please make sure the URL is right.\n')
     os._exit(0)
 
-res = r'<li><a .*?>(.*?)</a></li>'  # html 语言的 list 格式，用于 todo
-mm = re.findall(res, contents, re.S | re.M) # 查找 todo
+res = r'<li><a .*?>(.*?)</a></li>'  # 设置 list pattern
+mm = re.findall(res, contents, re.S | re.M)  # 生成歌名列表
 
 for value in mm:
     url = 'http://sug.music.baidu.com/info/suggestion'
     payload = {'word': value, 'version': '2', 'from': '0'}
-    print(value)
+    print(value)  # value 是歌名
 
-    r = requests.get(url, params=payload)
+    r = requests.get(url, params=payload)  # r 获取 url， 同时赋予 params 键值对
+    # print(r.url)  http://sug.music.baidu.com/info/suggestion?word=value&version=2&from=0
     contents = r.text
-    d = json.loads(contents, encoding="utf-8")
-    if d is not None and 'data' not in d:
+    d = json.loads(contents, encoding="utf-8")  # 把 contents 以 JSON 格式加载
+    if d is not None and 'data' not in d:  # 如果没抓到东西，跳过
+        print('No match. Skipping...\n')
         continue
-    songid = d["data"]["song"][0]["songid"]
-    print("find songid: %s" % songid)
+    songid = d["data"]["song"][0]["songid"]  # 看不懂，应该去了解 JSON todo
+    print("find songid: %s" % songid)  # 百度音乐上的 song id
 
-    url = "http://music.baidu.com/data/music/fmlink"
+    url = "http://music.baidu.com/data/music/fmlink"  # 抓取 song link
     payload = {'songIds': songid, 'type': 'flac'}
     r = requests.get(url, params=payload)
     contents = r.text
     d = json.loads(contents, encoding="utf-8")
     if('data' not in d) or d['data'] == '':
+        print('No match. Skipping...\n')
         continue
     songlink = d["data"]["songList"][0]["songLink"]
     print("find songlink: ")
     if(len(songlink) < 10):
-        print("\tdo not have flac\n")
+        print("No flac for " + value + "\n")
         continue
     print(songlink)
 
     songdir = "songs_dir"
-    if not os.path.exists(songdir):
+    if not os.path.exists(songdir):  # 判断、创建歌曲存放目录
         os.makedirs(songdir)
 
     songname = d["data"]["songList"][0]["songName"]
@@ -65,19 +72,19 @@ for value in mm:
 
     f = urllib.request.urlopen(songlink)
     headers = requests.head(songlink).headers
-    size = round(int(headers['Content-Length']) / (1024 ** 2), 2)
-    #Download unfinished Flacs again.
-    if not os.path.isfile(filename) or os.path.getsize(filename) < minimumsize: #Delete useless flacs
-        print("%s is downloading now ......\n\n" % songname)
+    size = round(int(headers['Content-Length']) / (1024 ** 2), 2)  # 不理解 todo
+    # Download unfinished Flacs again.
+    if not os.path.isfile(filename) or os.path.getsize(filename) < minimumsize:  # Delete useless flacs
+        print("%s is downloading now ......\n" % songname)
         if size >= minimumsize:
-            with open(filename, "wb") as code:
+            with open(filename, "wb") as code:  # 写入歌曲文件
                 code.write(f.read())
         else:
-            print("the size of %s (%r Mb) is less than 10 Mb, skipping" %
+            print("the size of %s (%r Mb) is less than 10 Mb, skipping\n" %
                   (filename, size))
     else:
-        print("%s is already downloaded. Finding next song...\n\n" % songname)
+        print("%s is already downloaded. Finding next song...\n" % songname)
 
 
-print("\n================================================================\n")
+print("================================================================\n")
 print("Download finish!\nSongs' directory is %s/songs_dir" % os.getcwd())
