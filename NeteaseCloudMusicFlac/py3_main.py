@@ -14,8 +14,8 @@ print("fetching msg from %s \n" % sys.argv[1])  # 获取命令行输入的第1�
 url = re.sub("#/", "", sys.argv[1])  # substitute, 消除"#/"
 r = requests.get(url)  # python开始读取url，内容全部放入r
 contents = r.text   # 以 r 中的 text 内容赋予 contents
-res = r'<ul class="f-hide">(.*?)</ul>'  # 贪婪匹配
-mm = re.findall(res, contents, re.S | re.M)  # 在 contents 中抓取满足 res 模式的内容，Dot Matches All | Multi-line
+res = r'<ul class="f-hide">(.*?)</ul>'  # 设置贪婪匹配的 pattern
+mm = re.findall(res, contents, re.S | re.M)  # 在 contents 中抓取满足 res 的内容，Dot Matches All | Multi-line
 print(mm)  # 打印出 mm ，观察变化以供学习
 print()
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))  # 存储路径的 slash 是和转义的 \ 同向的
@@ -42,7 +42,7 @@ for value in mm:
     r = requests.get(url, params=payload)  # r 获取 url， 同时赋予 params 键值对
     # print(r.url)  http://sug.music.baidu.com/info/suggestion?word=value&version=2&from=0
     contents = r.text
-    d = json.loads(contents, encoding="utf-8")  # 把 contents 以 JSON 格式加载
+    d = json.loads(contents, encoding="utf-8")  # 以 JSON 格式装载 contents
     if d is not None and 'data' not in d:  # 如果没有需要的东西，跳过
         print('No match. Skipping...\n')
         continue
