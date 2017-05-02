@@ -16,7 +16,8 @@ r = requests.get(url)  # python开始读取url，内容全部放入r
 contents = r.text   # 以 r 中的 text 内容赋予 contents
 res = r'<ul class="f-hide">(.*?)</ul>'  # 贪婪匹配
 mm = re.findall(res, contents, re.S | re.M)  # 在 contents 中抓取满足 res 模式的内容，Dot Matches All | Multi-line
-print(mm)
+print(mm)  # 打印出 mm ，观察变化以供学习
+print()
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))  # 存储路径的 slash 是和转义的 \ 同向的
 # print(__file__)   F:/exercises/NeteaseCloudMusicFlac/py3_main.py
 # print(os.path.realpath(__file__)) F:\exercises\NeteaseCloudMusicFlac\py3_main.py
@@ -30,6 +31,8 @@ else:
 
 res = r'<li><a .*?>(.*?)</a></li>'  # 设置 list pattern
 mm = re.findall(res, contents, re.S | re.M)  # 生成歌名列表
+print(mm)
+print()
 
 for value in mm:
     url = 'http://sug.music.baidu.com/info/suggestion'
