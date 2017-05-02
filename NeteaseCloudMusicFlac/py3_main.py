@@ -16,6 +16,7 @@ r = requests.get(url)  # python开始读取url，内容全部放入r
 contents = r.text   # 以 r 中的 text 内容赋予 contents
 res = r'<ul class="f-hide">(.*?)</ul>'  # 贪婪匹配
 mm = re.findall(res, contents, re.S | re.M)  # 在 contents 中抓取满足 res 模式的内容，Dot Matches All | Multi-line
+print(mm)
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))  # 存储路径的 slash 是和转义的 \ 同向的
 # print(__file__)   F:/exercises/NeteaseCloudMusicFlac/py3_main.py
 # print(os.path.realpath(__file__)) F:\exercises\NeteaseCloudMusicFlac\py3_main.py
@@ -42,7 +43,7 @@ for value in mm:
     if d is not None and 'data' not in d:  # 如果没有需要的东西，跳过
         print('No match. Skipping...\n')
         continue
-    songid = d["data"]["song"][0]["songid"]  # 看不懂，应该去了解 JSON todo
+    songid = d["data"]["song"][0]["songid"]  # 由于 "song" 的值是个列表，所以需要加个[0]，再指向 "songid"
     print("find songid: %s" % songid)  #   打印百度音乐上的 song id
 
     # 抓取 song link
@@ -87,4 +88,4 @@ for value in mm:
 
 
 print("================================================================\n")
-print("Download finish!\nSongs' directory is %s/songs_dir" % os.getcwd())
+print("Download finish!\nSongs' directory is %s\\songs_dir" % os.getcwd())
