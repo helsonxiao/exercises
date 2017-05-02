@@ -15,9 +15,8 @@ url = re.sub("#/", "", sys.argv[1])  # substitute, 消除"#/"
 r = requests.get(url)  # python开始读取url，内容全部放入r
 contents = r.text   # 以 r 中的 text 内容赋予 contents
 res = r'<ul class="f-hide">(.*?)</ul>'  # 贪婪匹配
-mm = re.findall(res, contents, re.S | re.M)  # 在 contents 中抓取满足 res 模式的内容
-                                             # re.MULTILINE | re.DOTALL
-CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))  # 应该尝试下 os.path.dirname(__file__) todo
+mm = re.findall(res, contents, re.S | re.M)  # 在 contents 中抓取满足 res 模式的内容，Dot Matches All | Multi-line
+CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))  # 存储路径的 slash 是和转义的 \ 同向的
 # print(__file__)   F:/exercises/NeteaseCloudMusicFlac/py3_main.py
 # print(os.path.realpath(__file__)) F:\exercises\NeteaseCloudMusicFlac\py3_main.py
 # print(CURRENT_PATH)   F:\exercises\NeteaseCloudMusicFlac
@@ -40,13 +39,14 @@ for value in mm:
     # print(r.url)  http://sug.music.baidu.com/info/suggestion?word=value&version=2&from=0
     contents = r.text
     d = json.loads(contents, encoding="utf-8")  # 把 contents 以 JSON 格式加载
-    if d is not None and 'data' not in d:  # 如果没抓到东西，跳过
+    if d is not None and 'data' not in d:  # 如果没有需要的东西，跳过
         print('No match. Skipping...\n')
         continue
     songid = d["data"]["song"][0]["songid"]  # 看不懂，应该去了解 JSON todo
-    print("find songid: %s" % songid)  # 百度音乐上的 song id
+    print("find songid: %s" % songid)  #   打印百度音乐上的 song id
 
-    url = "http://music.baidu.com/data/music/fmlink"  # 抓取 song link
+    # 抓取 song link
+    url = "http://music.baidu.com/data/music/fmlink"
     payload = {'songIds': songid, 'type': 'flac'}
     r = requests.get(url, params=payload)
     contents = r.text
@@ -72,13 +72,13 @@ for value in mm:
 
     f = urllib.request.urlopen(songlink)
     headers = requests.head(songlink).headers
-    size = round(int(headers['Content-Length']) / (1024 ** 2), 2)  # 不理解 todo
+    size = round(int(headers['Content-Length']) / (1024 ** 2), 2)  # B -> KB -> MB, round - 四舍五入（2 位小数）
     # Download unfinished Flacs again.
     if not os.path.isfile(filename) or os.path.getsize(filename) < minimumsize:  # Delete useless flacs
         print("%s is downloading now ......\n" % songname)
         if size >= minimumsize:
             with open(filename, "wb") as code:  # 写入歌曲文件
-                code.write(f.read())
+                code.write(f.read())  # 读取 f 全部内容，然后写入 code
         else:
             print("the size of %s (%r Mb) is less than 10 Mb, skipping\n" %
                   (filename, size))
