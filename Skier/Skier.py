@@ -10,7 +10,7 @@ skier_images = ["skier_down.png", "skier_right1.png", "skier_right2.png",
 class SkierClass(pygame.sprite.Sprite):
     # 人物初始化
     def __init__(self):
-        pygame.sprite.Sprite.__init__(self)  # 继承 - 动画精灵
+        pygame.sprite.Sprite.__init__(self)  # 继承动画精灵
         self.image = pygame.image.load("skier_down.png")  # 加载向下运动的图片，赋给滑雪者的图像属性
         self.rect = self.image.get_rect()  # 把“获取图像位置”这个方法赋给滑雪者的位置属性
         self.rect.center = [320, 100]  # 固定滑雪者的中心位置
@@ -42,7 +42,7 @@ class SkierClass(pygame.sprite.Sprite):
 class ObstacleClass(pygame.sprite.Sprite):
     def __init__(self, image_file, location, type):
         pygame.sprite.Sprite.__init__(self)
-        # self.image_file = image_file  感觉多余，去掉后测试也没有问题
+        self.image_file = image_file  # 感觉多余，去掉后测试也没有问题
         self.image = pygame.image.load(image_file)
         self.rect = self.image.get_rect()
         self.rect.center = location  # 初始化障碍物的中心位置
@@ -71,7 +71,7 @@ def create_map():
             elif type == "flag":
                 img = "skier_flag.png"
             obstacle = ObstacleClass(img, location, type)  # 生成障碍物实例
-            obstacles.add(obstacle)
+            obstacles.add(obstacle)  # 添加进动画精灵集合
 
 # 画很多东西
 def animate():
@@ -85,12 +85,12 @@ def animate():
 pygame.init()  # 初始化pygame模块
 screen = pygame.display.set_mode([640, 640])  # 设置窗口大小
 clock = pygame.time.Clock()  # 生成时钟对象
-skier = SkierClass()
+skier = SkierClass()  # 生成滑雪者实例
 speed = [0, 6]  # 初始速度
 obstacles = pygame.sprite.Group()  # 生成对象集合，用于碰撞检测。
 map_position = 0  # 初始地图位置
 points = 0  # 得分
-create_map()
+create_map()  # 画地图
 font = pygame.font.Font(None, 50)  # 设置字体大小
 
 running = True
@@ -113,12 +113,12 @@ while running:
     # 碰撞检测
     hit = pygame.sprite.spritecollide(skier, obstacles, False)
     if hit:
-        if hit[0].type == "tree" and not hit[0].passed:
+        if hit[0].type == "tree" and not hit[0].passed:  # hit 是个列表，但里面只有1个障碍物。因为你每次只能撞上1个。
             points = points - 100
             skier.image = pygame.image.load("skier_crash.png")
             animate()  # 更新界面
             pygame.time.delay(1000)  # 延迟 1000ms
-            skier.image = pygame.image.load("skier_down.png")
+            skier.image = pygame.image.load("skier_down.png")  # 初始化
             skier.angel = 0
             speed = [0, 6]
             hit[0].passed = True  # 撞完之后可以通过障碍物
