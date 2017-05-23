@@ -98,8 +98,8 @@ ENV/
 # mypy
 .mypy_cache/
 
-## pycharm
-#.idea/
+# pycharm
+.idea/
 
 # files
 *.pkl
